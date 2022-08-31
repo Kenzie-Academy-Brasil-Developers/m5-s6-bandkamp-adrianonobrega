@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres
+    env_file: .env
+    ports:
+      - 5435:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # healthcheck:
+    #   test: ['CMD-SHELL',"sh -c 'pg_isready'"]  
+    #   interval: 5s
+    #   timeout: 2s
+    #   retries: 
+
+  migration:
+    build: .
+    volumes:
+      - .:/code
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py migrate'
+    depends_on:
+      - db
+      # db:
+      #   condition: service_healty
+
+
+  web:
+    build: .
+    env_file: .env
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py runserver 0.0.0.0:8000'
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/code
+    depends_on:
+      - migration
+      - db
+
+volumes:
+  pgdata:
