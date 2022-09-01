@@ -102,6 +102,20 @@ WSGI_APPLICATION = 'bandkamp.wsgi.application'
 if os.getenv("GITHUB_WORKFLOW"):
 
     DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "github-actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
+
+
+else:
+
+  DATABASES = {
     "default":{
         "ENGINE":"django.db.backends.postgresql",
         "NAME": os.getenv("POSTGRES_DB"),
@@ -111,14 +125,6 @@ if os.getenv("GITHUB_WORKFLOW"):
         "PORT": 5432,
     },
     }
-else:
-
-    DATABASES = {
-    'test': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
