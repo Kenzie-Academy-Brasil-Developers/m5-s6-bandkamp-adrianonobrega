@@ -63,7 +63,7 @@ class MusicianAlbumSongView(generics.ListCreateAPIView):
         musician_id = self.request.path.split("/")[3]
         album_id = self.request.path.split("/")[5]
         album = get_object_or_404(Album,id = album_id)
-        musician = get_object_or_404(Musician,id = musician_id )
+        get_object_or_404(Musician,id = musician_id )
         serializer.save(album=album)
 
     def get_queryset(self):

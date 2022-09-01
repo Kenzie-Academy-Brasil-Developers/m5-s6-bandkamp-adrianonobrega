@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from email.policy import default
+
 from pathlib import Path
 import os
 import dotenv
+import dj_database_url
 
 dotenv.load_dotenv()
 
@@ -30,7 +31,7 @@ SECRET_KEY = 'django-insecure-mk=3_%a%1r&5_!h)74mfury8x#-7r5=u6s15(5r=2%aeoz!-v)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ['bandkamp-deploy.herokuapp.com',"localhost"]
 
 
 # Application definition
@@ -46,7 +47,23 @@ INSTALLED_APPS = [
     'musicians',
     'albums',
     'songs',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema",
+     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 2,
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'bandkamp',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '0.23.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,10 +99,9 @@ WSGI_APPLICATION = 'bandkamp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+if os.getenv("GITHUB_WORKFLOW"):
 
-
-DATABASES = {
-
+    DATABASES = {
     "default":{
         "ENGINE":"django.db.backends.postgresql",
         "NAME": os.getenv("POSTGRES_DB"),
@@ -94,13 +110,24 @@ DATABASES = {
         "HOST":"db",
         "PORT": 5432,
     },
-    
+    }
+else:
 
+    DATABASES = {
     'test': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    db_from_env = dj_database_url.config(
+        default=DATABASE_URL, conn_max_age=500, ssl_require=True)
+    DATABASES['default'].update(db_from_env)
+    DEBUG = False
 
 
 # Password validation
@@ -143,3 +170,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
