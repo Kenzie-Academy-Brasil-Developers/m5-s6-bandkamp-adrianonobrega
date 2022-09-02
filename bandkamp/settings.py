@@ -105,8 +105,8 @@ if os.getenv("GITHUB_WORKFLOW"):
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": "github-actions",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
+            "USER": "sqlite3",
+            "PASSWORD": "sqlite3",
             "HOST": "localhost",
             "PORT": "5432",
         }
